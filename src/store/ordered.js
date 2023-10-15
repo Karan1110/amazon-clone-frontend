@@ -3,13 +3,14 @@ const orderedStore = async (set) => {
     headers: {
       "x-auth-token": localStorage.getItem("token"), // Replace "ssss" with your actual token value
     },
-  });
+  })
 
-  const data = await response.json();
-  console.log(data);
+  const data = await response.json()
+  console.log(data)
   set({
     ordered_products: data,
-  });
-};
+  })
+  console.log(data)
+}
 
-export default orderedStore;
+export default orderedStore

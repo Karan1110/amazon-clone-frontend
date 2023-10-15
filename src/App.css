@@ -1,3 +1,25 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+:root {
+  --scrollbar-border-radius: 200px;
+}
+
+/* Style the scrollbar */
+::-webkit-scrollbar {
+  /* color: white */
+  width: 12px; /* Adjust as needed */
+}
+
+/* Style the scrollbar track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Adjust as needed */
+  /* color:  */
+  border-radius: var(--scrollbar-border-radius); /* Use the custom property */
+}
+
+/* Style the scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Adjust as needed */
+  border-radius: var(--scrollbar-border-radius); /* Use the custom property */
+}
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";

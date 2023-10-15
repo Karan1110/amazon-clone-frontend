@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import useProductStore from "../store/index"
 
 const Product = () => {
+  const recommendedProducts = useProductStore((state) => state.top_products)
   const product = useProductStore((state) => state.product)
   const addRating = useProductStore((state) => state.addRating)
   const fetchProduct = useProductStore((state) => state.fetchProduct)
@@ -151,6 +152,7 @@ const Product = () => {
         <div
           className="fixed  top-0 left-0 right-0 bottom-0 bg-black bg-opacity-70 z-50 flex justify-center items-center "
           onClick={() => setIsModalOpen(false)} // Close the modal on click outside the image
+          data-testid="modal"
         >
           <div className="w-3/4 max-h-3/4 max-w-3/4 bg-white rounded-lg relative ">
             <img
@@ -173,144 +175,192 @@ const Product = () => {
           <div className="w-5 h-5 border-t-4 border-pink-600 rounded-full animate-spin"></div>
         </div>
       ) : (
-        // Actual Product Details
-
-        <div className="p-0 overflow-hidden flex flex-start shadow-2xl mb-3">
-          <div className="flex flex-col">
-            {product.forms.map((form, index) => (
-              <>
-                <button
-                  key={form.id} // Make sure to add the "key" prop when using a dynamic list
-                  onClick={() => {
-                    handleAttributeChange(form.image_filename)
-                    setSelectedForm(index)
-                  }}
-                  className={`py-2 px-4 bg-pink-600 text-white hover:bg-pink-700 transition duration-300 relative bottom-0 mb-30 m-3 p-1 rounded-lg
+        <>
+          <div className="p-0 overflow-hidden flex flex-start shadow-md mb-3">
+            <div className="flex flex-col">
+              {product.forms.map((form, index) => (
+                <>
+                  <button
+                    key={form.id} // Make sure to add the "key" prop when using a dynamic list
+                    onClick={() => {
+                      handleAttributeChange(form.image_filename)
+                      setSelectedForm(index)
+                    }}
+                    className={`py-2 px-4 bg-pink-600 font-bold text-white hover:bg-pink-700 transition duration-300 relative bottom-0 mb-30 m-3 p-1 rounded-lg
                   ${index == selectedForm ? "border-2 border-pink-500" : ""}`}
-                  style={{
-                    width: "7vw",
-                    height: "5vw",
-                    backgroundImage: `url(http://localhost:3900/${form.image_filename})`,
-                    backgroundSize: "cover",
-                  }}
-                ></button>
-                <div className="text-center text-pink-900 font-semibold">
-                  {form.name}
-                </div>
-              </>
-            ))}
-          </div>
+                    style={{
+                      width: "7vw",
+                      height: "5vw",
+                      backgroundImage: `url(http://localhost:3900/${form.image_filename})`,
+                      backgroundSize: "cover",
+                    }}
+                  ></button>
+                  <div className="text-center text-pink-900 font-semibold">
+                    {form.name}
+                  </div>
+                </>
+              ))}
+            </div>
 
-          <div
-            className="max-w-12xl bg-white  h-full w-full overflow-hidden flex flex-start"
-            // style={{ width: "99vw" }}
-          >
-            <img
-              src={
-                selectedImage !== null
-                  ? selectedImage
-                  : `http://localhost:3900/${product.forms[0].image_filename}`
-              }
-              alt="Product"
-              className="h-96 w-full object-cover m-6 shadow-2xl"
-              style={{ height: "40vw", width: "35vw" }}
-              onClick={handleImageClick}
-            />
-            <div className="p-4 flex  flex-col ">
-              <div className="mb-3">
-                <h1 className="text-3xl font-bold text-pink-800">
-                  {product.title}
-                </h1>
+            <div
+              className="max-w-12xl bg-white  h-full w-full overflow-hidden flex flex-start"
+              // style={{ width: "99vw" }}
+            >
+              <img
+                src={
+                  selectedImage !== null
+                    ? selectedImage
+                    : `http://localhost:3900/${product.forms[0].image_filename}`
+                }
+                alt="Product"
+                className="h-96 w-full object-cover m-6 shadow-2xl"
+                style={{ height: "40vw", width: "35vw" }}
+                onClick={handleImageClick}
+              />
+              <div className="p-4 flex  flex-col ">
+                <div className="mb-3">
+                  <h1 className="text-3xl font-bold text-pink-800">
+                    {product.title}
+                  </h1>
 
-                <p className="text-pink-600 font-bold mt-1">Description</p>
-                {/* <br /> */}
-                <p className="text-pink-600 font-semibold ">
-                  {product.description}
-                </p>
-                <p className="text-gray-400 font-semibold text-2xl m-2">
-                  Price : ${product.price}
-                </p>
-                <p className="text-gray-500 font-bold text-2xl m-2">
-                  Brand : {product.brand}
-                </p>
-                <p className="text-gray-500 font-bold text-2xl m-2">
-                  Category : {product.category}
-                </p>
-                <div className="mt-6 space-x-4">
-                  {product.size.map((size, index) => (
-                    <button
-                      key={size}
-                      className={`px-4 py-2   border-2 border-pink-500 text-gray font-semibold shadow-2xl m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
-                        index == selectedSize ? "bg-pink-700" : ""
-                      }`}
-                      onClick={() => setSelectedSize(index)}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <button
-                  className="w-full py-3 bg-pink-600 text-white rounded-2xl hover:bg-pink-700 transition duration-300"
-                  onClick={handleOrderClick}
-                >
-                  Order Now
-                </button>
-                <button
-                  className="w-full py-3 mt-3 bg-pink-600 text-white rounded-2xl hover:bg-pink-700 transition duration-300"
-                  onClick={() => handleCartClick()}
-                >
-                  Add to Cart
-                </button>
-                <h3 className="font-bold text-xl text-pink-600 text-center m-2">
-                  {" "}
-                  Ratings{" "}
-                </h3>
-                <div className="grid grid-cols-3">
-                  {/* Existing ratings */}
-                  {product.ratings.map((rating, index) => (
-                    <div
-                      key={index}
-                      className="bg-pink-100  p-4 m-4 rounded-2xl "
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                          {rating.rating}
-                        </div>
-                        <p className="text-pink-800 font-bold">
-                          {rating.user.name}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  {/* Add a new rating */}
-                  <div className="bg-pink-100 p-2 mt-4 rounded-2xl flex items-center justify-center text-center">
-                    <div className="flex items-center space-x-5">
-                      <input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={userRating}
-                        onChange={(e) =>
-                          setUserRating(parseInt(e.target.value))
-                        }
-                        className="w-16 text-center  h-12 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg"
-                      />
+                  <p className="text-pink-600 font-bold mt-1">Description</p>
+                  {/* <br /> */}
+                  <p className="text-pink-600 font-semibold ">
+                    {product.description}
+                  </p>
+                  <p className="text-gray-400 font-semibold text-2xl m-2">
+                    Price : ${product.price}
+                  </p>
+                  <p className="text-gray-500 font-bold text-2xl m-2">
+                    Brand : {product.brand}
+                  </p>
+                  <p className="text-gray-500 font-bold text-2xl m-2">
+                    Category : {product.category}
+                  </p>
+                  <div className="mt-6 space-x-4">
+                    {product.size.map((size, index) => (
                       <button
-                        className="bg-pink-600 text-white rounded-2xl px-4 py-2 hover:bg-pink-700 transition duration-300"
-                        onClick={async () => await handleAddRating()}
+                        key={size}
+                        className={`px-4 py-2  font-bold border-2 border-pink-500 text-gray font-semibold shadow-2xl m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
+                          index == selectedSize ? "bg-pink-700" : ""
+                        }`}
+                        onClick={() => setSelectedSize(index)}
                       >
-                        Add Rating
+                        {size}
                       </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <button
+                    className="w-full font-bold py-3 bg-pink-600 text-white rounded-2xl hover:bg-pink-700 transition duration-300"
+                    onClick={handleOrderClick}
+                  >
+                    Order Now
+                  </button>
+                  <button
+                    className="w-full font-bold font-size py-3 mt-3 bg-pink-600 text-white rounded-2xl hover:bg-pink-700 transition duration-300"
+                    onClick={() => handleCartClick()}
+                  >
+                    Add to Cart
+                  </button>
+                  <h3 className="font-bold text-xl text-pink-600 text-center m-2">
+                    {" "}
+                    Ratings{" "}
+                  </h3>
+                  <div className="grid grid-cols-3">
+                    {/* Existing ratings */}
+                    {product.ratings.map((rating, index) => (
+                      <div
+                        key={index}
+                        className="bg-pink-100  p-4 m-4 rounded-2xl "
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            {rating.rating}
+                          </div>
+                          <p className="text-pink-800 font-bold">
+                            {rating.user.name}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    {/* Add a new rating */}
+                    <div className="bg-pink-100 p-2 mt-4 rounded-2xl flex items-center justify-center text-center">
+                      <div className="flex items-center space-x-5">
+                        <input
+                          type="number"
+                          min="1"
+                          max="5"
+                          value={userRating}
+                          onChange={(e) =>
+                            setUserRating(parseInt(e.target.value))
+                          }
+                          className="w-16 text-center  h-12 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg"
+                        />
+                        <button
+                          className="bg-pink-600 text-white rounded-2xl px-4 py-2 hover:bg-pink-700 transition duration-300"
+                          onClick={async () => await handleAddRating()}
+                        >
+                          Add Rating
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+          <div className="border-b border-pink-500 my-4"></div>
+          <h2 className="text-pink-900 text-2xl m-5 font-bold">
+            Recommended Products
+          </h2>
+          <div className="flex flex-wrap justify-start">
+            {recommendedProducts.map((product) => (
+              <div
+                key={product._id}
+                className="border border-pink-500 mb-4 rounded-2xl py-4 mr-4 ml-4 mt-4 shadow-xl min-h-xl"
+                style={{ width: "20vw", height: "30vw" }}
+              >
+                <img
+                  src={`http://localhost:3900/${product.forms[0].image_filename}`}
+                  className="h-100 w-full object-cover rounded-2xl"
+                  style={{ height: "15vw", width: "20vw" }}
+                  alt={product.title}
+                />
+                <div className="p-4">
+                  <h3 className="text-pink-800 text-xl font-semibold mb-2">
+                    {product.title}
+                  </h3>
+                  <p className="text-pink-600 ">{product.description}</p>
+                  <p className="text-gray-400 font-semibold text-lg">
+                    ${product.price}
+                  </p>
+                  <p className="text-pink-800 font-bold text-sm">
+                    Brand : {product.brand}
+                  </p>
+                  <p className="text-pink-800 font-bold text-sm">
+                    Category : {product.category}
+                  </p>
+                  <Link to={`/product/${product._id}`}>
+                    <button className="bg-pink-500 text-white rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
+                      View More
+                    </button>
+                  </Link>
+                  <button
+                    className="bg-pink-500 text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
+                    onClick={() => {
+                      // Handle add to cart click here
+                    }}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

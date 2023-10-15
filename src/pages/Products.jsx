@@ -1,20 +1,33 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import useStore from "../store/index";
-
+import React from "react"
+import { Link, useNavigate } from "react-router-dom"
+import useStore from "../store/index"
+import addNotification from "react-push-notification"
 const Products = () => {
-  const products = useStore((state) => state.products);
-  const trending_products = useStore((state) => state.trending_products);
-  const top_products = useStore((state) => state.top_products);
-  console.log(products);
-  const history = useNavigate();
-
+  const products = useStore((state) => state.products)
+  const trending_products = useStore((state) => state.trending_products)
+  const top_products = useStore((state) => state.top_products)
+  console.log(products)
+  const history = useNavigate()
+  function send() {
+    try {
+      addNotification({
+        title: "Warning",
+        subtitle: "This is a subtitle",
+        message: "This is a very long message",
+        theme: "darkblue",
+        native: true, // when using native, your OS will handle theming.
+      })
+    } catch (ex) {
+      console.error(ex)
+    }
+  }
+  send()
   async function sendCartFetchRequest(productId, authToken) {
     if (!localStorage.getItem("token")) {
-      history("/signup", { state: { from: window.location.pathname } });
+      history("/signup", { state: { from: window.location.pathname } })
     }
 
-    const url = "http://localhost:3900/api/cart";
+    const url = "http://localhost:3900/api/cart"
 
     const requestOptions = {
       method: "POST", // Adjust the method as needed (GET, POST, PUT, DELETE, etc.)
@@ -23,23 +36,23 @@ const Products = () => {
         "x-auth-token": authToken,
       },
       body: JSON.stringify({ product_id: productId }),
-    };
+    }
 
     try {
-      const response = await fetch(url, requestOptions);
+      const response = await fetch(url, requestOptions)
       if (!response.ok) {
         // Handle the error response if needed
-        const errorData = await response.json();
-        throw new Error(errorData.message);
+        const errorData = await response.json()
+        throw new Error(errorData.message)
       }
 
       // If successful, return the response data (if any)
-      const responseData = await response.json();
-      return responseData;
+      const responseData = await response.json()
+      return responseData
     } catch (error) {
       // Handle any other errors that may occur during the fetch
-      console.error("Error occurred while fetching data:", error.message);
-      throw error;
+      console.error("Error occurred while fetching data:", error.message)
+      throw error
     }
   }
 
@@ -81,11 +94,13 @@ const Products = () => {
                   </Link>
                   <button
                     className="bg-pink-500 text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
+                    id="my_button"
                     onClick={() => {
                       sendCartFetchRequest(
                         product._id,
                         localStorage.getItem("token")
-                      );
+                      )
+                      send()
                     }}
                   >
                     add to cart.
@@ -135,7 +150,8 @@ const Products = () => {
                       sendCartFetchRequest(
                         product._id,
                         localStorage.getItem("token")
-                      );
+                      )
+                      send()
                     }}
                   >
                     add to cart.
@@ -185,7 +201,9 @@ const Products = () => {
                       sendCartFetchRequest(
                         product._id,
                         localStorage.getItem("token")
-                      );
+                      )
+
+                      send()
                     }}
                   >
                     add to cart.
@@ -196,7 +214,7 @@ const Products = () => {
           : null}
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Products;
+export default Products

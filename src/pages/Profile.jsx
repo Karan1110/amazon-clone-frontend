@@ -1,43 +1,41 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import useStore from "../store/index";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import useStore from "../store/index"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faUser } from "@fortawesome/free-solid-svg-icons"
 
 const Profile = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const ordered_products = useStore((state) => state.ordered_products);
-  const user = useStore((state) => state.user);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true)
+  const ordered_products = useStore((state) => state.ordered_products)
+  const user = useStore((state) => state.user)
+  const navigate = useNavigate()
 
   useEffect(() => {
     setTimeout(() => {
-      setIsLoading(false);
-      console.log(ordered_products);
-    }, 500);
-  }, []);
+      setIsLoading(false)
+      console.log(ordered_products?.length)
+    }, 1000)
+  }, [ordered_products])
 
   if (isLoading || !ordered_products) {
     return (
-      // Skeleton Loading UI or other loading state
-      // You can customize this part as needed
-      <div className="p-4 flex items-center justify-center text-center ">
+      <div className="p-4 flex items-center justify-center text-center min-h-screen">
         <div
           className="border-t-4 border-pink-600 rounded-full animate-spin"
           style={{ height: "10vw", width: "10vw" }}
         ></div>
       </div>
-    );
+    )
   }
+
   return (
     <div
-      className="w-screen bg-pink-100 flex flex-col min-h-screen items-center justify-start"
+      className="w-screen bg-white flex flex-col min-h-screen items-center justify-start"
       style={{ width: "99vw" }}
     >
-      {ordered_products.length < 0 ? (
+      {ordered_products.length == 0 ? (
         <>
           <div>
-            {/* Ordered Products Section */}
             <div className="flex items-center justify-center mb-6 mt-10">
               <FontAwesomeIcon
                 className="text-pink-500"
@@ -46,18 +44,39 @@ const Profile = () => {
               ></FontAwesomeIcon>
             </div>
             <div className="text-center mb-6">
-              <h2 className="text-pink-800 text-3xl font-bold"></h2>
-              <p className="text-pink-600 text-lg"></p>
+              <h2 className="text-pink-800 text-3xl font-bold">
+                {" "}
+                {user.name}{" "}
+              </h2>
+              <p className="text-pink-600 text-lg">{user.address.city}</p>
+              {user ? (
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("user")
+                    localStorage.removeItem("token")
+                  }}
+                  className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+                >
+                  Log Out
+                </button>
+              ) : (
+                <button
+                  className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+                  onClick={() => navigate("/signup")}
+                >
+                  Sign up
+                </button>
+              )}
             </div>
             <div className="w-full">
-              <div className="bg-pink-50 p-6 rounded-2xl shadow-xl w-96 md:w-full">
-                <h3 className="text-pink-800 text-center text-xl font-bold mb-6 text-center w-full">
+              <div className=" p-2 rounded-2xl  w-96 md:w-full">
+                <h3 className="text-pink-800 text-4xl text-center text-xl font-bold mb-6 text-center w-full">
                   Ordered Products
                 </h3>
               </div>
             </div>
           </div>
-          <div className="bg-red-200 p-4 mb-6 mt-10 rounded-2xl">
+          <div className="sm:text-2xl md:text-6xl p-2 mb-6 mt-0 rounded-2xl">
             No products ordered yet.
           </div>
         </>
@@ -75,10 +94,32 @@ const Profile = () => {
           <div className="text-center mb-6">
             <h2 className="text-pink-800 text-3xl font-bold">{user.name}</h2>
             <p className="text-pink-600 text-lg">{user.address.city}</p>
+            {user ? (
+              <button
+                onClick={() => {
+                  localStorage.removeItem("user")
+                  localStorage.removeItem("token")
+                }}
+                className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+              >
+                Log Out
+              </button>
+            ) : (
+              <button
+                className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+                onClick={() => navigate("/signup")}
+              >
+                Sign up
+              </button>
+            )}
           </div>
           <div className="w-full">
-            <div className="bg-pink-50 p-6 rounded-2xl shadow-xl w-96 md:w-full">
-              <h3 className="text-pink-800 text-center text-xl font-bold mb-6 text-center w-full">
+            <div className=" p-2 rounded-2xl  w-96 md:w-full">
+              <h3
+                className="text-pink-800 text-4xl 
+              
+              text-center text-xl font-bold mb-6 text-center w-full"
+              >
                 Ordered Products
               </h3>
               {/* Loop through the products array and render each product */}
@@ -117,7 +158,7 @@ const Profile = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile

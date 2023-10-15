@@ -15,6 +15,7 @@ const NavBar = () => {
   const [searchSuggestions, setSearchSuggestions] = useState([])
   const [isLoadingSidebar, setIsLoadingSidebar] = useState(false)
   const cart = useStore((state) => state.cartItems)
+  const user = useStore((state) => state.user)
   const products = useStore((state) => state.products)
   function getProductByTitle(title) {
     const product = products.find(
@@ -109,7 +110,7 @@ const NavBar = () => {
   }, [isSidebarOpen])
 
   return (
-    <nav className="bg-white p-2 shadow-2xl  ">
+    <nav className="bg-white p-2 shadow-2xl mr-1 ml-1 mt-1 rounded-2xl fixed top-0   p-4 md:sticky md:top-0 ">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/profile">
@@ -150,16 +151,20 @@ const NavBar = () => {
               Our Products
             </h3>
           </Link>
-          <Link to="/login">
-            <h3 className="text-center text-pink-900 text-xl font-bold">
-              Login
-            </h3>
-          </Link>
-          <Link to="/signup">
-            <h3 className="text-center text-pink-900 text-xl font-bold">
-              Sign Up
-            </h3>
-          </Link>
+          {user ? null : (
+            <>
+              <Link to="/login">
+                <h3 className="text-center text-pink-900 text-xl font-bold">
+                  Login
+                </h3>
+              </Link>
+              <Link to="/signup">
+                <h3 className="text-center text-pink-900 text-xl font-bold">
+                  Sign Up
+                </h3>
+              </Link>
+            </>
+          )}
         </div>
         <div className="flex items-center space-x-6">
           <button
@@ -180,6 +185,13 @@ const NavBar = () => {
           >
             All Products
           </button>
+          {user?.isAdmin == true ? (
+            <Link to="/add">
+              <h3 className="text-center text-pink-900 text-xl font-bold">
+                Add
+              </h3>
+            </Link>
+          ) : null}
         </div>
       </div>
       {cart ? (
@@ -193,6 +205,8 @@ const NavBar = () => {
             zIndex: 9999999,
             scrollbarWidth: "thin",
             scrollbarColor: "#f472b6 #f9a8d4",
+            top: 93,
+            opacity: "100%",
           }}
         >
           <div className="flex relative sticky justify-end">
@@ -240,9 +254,9 @@ const NavBar = () => {
                   </div>
                 </div>
               ))}
-              <h1 className="mt-5 ml-8 text-pink-900 text-xl font-bold">
+              <h1 className="mt-5 ml-8 text-pink-900 text-md font-semibold">
                 {" "}
-                subtotal :{""}
+                subtotal: {""}
                 {cart.reduce((accumulator, product) => {
                   return accumulator + product.price
                 }, 0)}

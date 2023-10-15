@@ -33,29 +33,25 @@ const Signup = () => {
       const data = await response.json()
       console.log(data)
 
-      if (response.ok) {
-        // Sign-up successful, redirect to the homepage
-        localStorage.setItem("token", data.token)
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            _id: data.user._id,
-            name: data.user.name,
-          })
-        )
+      // Sign-up successful, redirect to the homepage
+      localStorage.setItem("token", data.token)
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          _id: data._id,
+          name: data.name,
+        })
+      )
 
-        if (location.state?.from) {
-          navigate(location.state.from)
-        } else {
-          // If there's no original location, navigate to a default page
-          navigate("/")
-        }
+      if (location.state?.from) {
+        navigate(location.state.from)
       } else {
-        // Sign-up failed, show the error message in an alert
-        setError(data.message)
+        // If there's no original location, navigate to a default page
+        navigate("/")
       }
     } catch (error) {
-      setError("An error occurred. Please try again later.")
+      console.log(error)
+      setError("An error occurred. Please try again later.", error)
     }
   }
 

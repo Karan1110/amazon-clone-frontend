@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState, useEffect, useRef } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faChevronLeft,
   faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+} from "@fortawesome/free-solid-svg-icons"
 
 const images = [
   "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
@@ -14,11 +14,11 @@ const images = [
 
   "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8c2hvZXN8ZW58MHx8MHx8fDA%3D&w=1000&q=80",
   // Add more image URLs here
-];
+]
 
 const SideBar = () => {
-  const galleryRef = useRef(null);
-  const [currentImage, setCurrentImage] = useState(0);
+  const galleryRef = useRef(null)
+  const [currentImage, setCurrentImage] = useState(0)
 
   // Function to handle clicking on the left button
   const handleLeftClick = () => {
@@ -26,29 +26,29 @@ const SideBar = () => {
     //   prevImage === 0 ? images.length - 1 : prevImage - 1
     // );
 
-    const galleryWidth = galleryRef.current.offsetWidth;
+    const galleryWidth = galleryRef.current.offsetWidth
     galleryRef.current.scrollTo({
       left: galleryWidth,
       behavior: "smooth",
-    });
-  };
+    })
+  }
 
   // Function to handle clicking on the right button
   const handleRightClick = () => {
     setCurrentImage((prevImage) =>
       prevImage === images.length - 1 ? 0 : prevImage + 1
-    );
-  };
+    )
+  }
 
   // Automatically scroll to the right image every 3 seconds
   useEffect(() => {
-    const interval = setInterval(handleRightClick, 3000);
+    const interval = setInterval(handleRightClick, 3000)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <div className="w-200 h-100vw bg-white mt-1 shadow-2xl overflow-hidden relative z-index-0 ">
+    <div className="w-200 h-100vw bg-white  shadow-2xl overflow-hidden relative z-index-0 ">
       <div
         ref={galleryRef}
         className="flex transition-transform duration-500 ease-in-out"
@@ -76,7 +76,7 @@ const SideBar = () => {
         <FontAwesomeIcon icon={faChevronRight} className="text-black" />
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default SideBar;
+export default SideBar

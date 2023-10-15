@@ -1,9 +1,9 @@
-import React from "react";
+import React from "react"
 
 const Footer = () => {
   return (
     <footer
-      className="bg-white bottom-0 py-6  mt-5 shadow-2xl border-pink-300"
+      className=" bottom-0 w-full bg-white py-6 shadow-2xl  "
       style={{ height: "10vw" }}
     >
       <div className="container mx-auto px-4">
@@ -43,7 +43,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer
