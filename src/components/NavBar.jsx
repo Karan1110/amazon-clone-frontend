@@ -185,7 +185,7 @@ const NavBar = () => {
           >
             All Products
           </button>
-          {user?.isAdmin == true ? (
+          {user?.isAdmin === true ? (
             <Link to="/add">
               <h3 className="text-center text-pink-900 text-xl font-bold">
                 Add

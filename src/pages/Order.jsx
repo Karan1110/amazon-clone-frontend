@@ -51,7 +51,7 @@ const Order = () => {
     fetch(apiUrl, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        if (paymentMethod == "card") {
+        if (paymentMethod === "card") {
           fetch(`http://localhost:3900/api/checkout/${data._id}`, {
             method: "POST",
             headers: {

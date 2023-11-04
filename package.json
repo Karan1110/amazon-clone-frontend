@@ -2,9 +2,6 @@
   "name": "codeswear",
   "version": "0.1.0",
   "private": true,
-  "jest": {
-    "verbose": true
-  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
@@ -27,10 +24,15 @@
     "zustand": "^4.3.9"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start && cd .. && nodemon index",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    }
   },
   "eslintConfig": {
     "extends": [

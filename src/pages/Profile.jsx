@@ -33,7 +33,7 @@ const Profile = () => {
       className="w-screen bg-white flex flex-col min-h-screen items-center justify-start"
       style={{ width: "99vw" }}
     >
-      {ordered_products.length == 0 ? (
+      {ordered_products.length === 0 ? (
         <>
           <div>
             <div className="flex items-center justify-center mb-6 mt-10">

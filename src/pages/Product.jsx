@@ -36,7 +36,7 @@ const Product = () => {
   }, [title, fetchProduct])
 
   // Check if the product data is still loading or not available
-  if (isLoading || !product.forms[0].image_filename) {
+  if (isLoading || product?.forms[0]?.image_filename === null || undefined) {
     return (
       // Skeleton Loading UI or other loading state
       // You can customize this part as needed
@@ -187,7 +187,7 @@ const Product = () => {
                       setSelectedForm(index)
                     }}
                     className={`py-2 px-4 bg-pink-600 font-bold text-white hover:bg-pink-700 transition duration-300 relative bottom-0 mb-30 m-3 p-1 rounded-lg
-                  ${index == selectedForm ? "border-2 border-pink-500" : ""}`}
+                  ${index === selectedForm ? "border-2 border-pink-500" : ""}`}
                     style={{
                       width: "7vw",
                       height: "5vw",
@@ -242,7 +242,7 @@ const Product = () => {
                       <button
                         key={size}
                         className={`px-4 py-2  font-bold border-2 border-pink-500 text-gray font-semibold shadow-2xl m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
-                          index == selectedSize ? "bg-pink-700" : ""
+                          index === selectedSize ? "bg-pink-700" : ""
                         }`}
                         onClick={() => setSelectedSize(index)}
                       >
