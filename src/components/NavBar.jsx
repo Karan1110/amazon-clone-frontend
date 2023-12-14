@@ -7,6 +7,7 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons"
 import useStore from "../store/index"
+import Cart from "./Cart"
 
 const NavBar = () => {
   const history = useNavigate()
@@ -25,6 +26,9 @@ const NavBar = () => {
   }
 
   const handleCartIconClick = () => {
+    if (!localStorage.getItem("token")) {
+      history("/signup", { state: { from: window.location.pathname } })
+    }
     setIsSidebarOpen(!isSidebarOpen)
   }
   async function handleCheckout() {
@@ -110,7 +114,7 @@ const NavBar = () => {
   }, [isSidebarOpen])
 
   return (
-    <nav className="bg-white p-2 shadow-2xl mr-1 ml-1 mt-1 rounded-2xl fixed top-0   p-4 md:sticky md:top-0 ">
+    <nav className="bg-white shadow-2xl mr-1 ml-1 mt-1 rounded-2xl fixed top-0   p-2 md:sticky md:top-0 ">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/profile">
@@ -135,7 +139,7 @@ const NavBar = () => {
             list="suggestionsList"
           />
           <button
-            className="bg-pink-500 text-white rounded-2xl px-4 py-2 hover:bg-pink-600 transition duration-300"
+            className="bg-pink-500 text-white rounded-2xl px-4 py-2 font-semibold hover:bg-pink-600 transition duration-300"
             onClick={handleSearch}
           >
             Search
@@ -168,108 +172,45 @@ const NavBar = () => {
         </div>
         <div className="flex items-center space-x-6">
           <button
-            className="bg-pink-700 text-white px-4 py-2 rounded-2xl font-bold hover:bg-pink-800 transition duration-300"
+            className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
             onClick={handleTrendingClick}
           >
             Trending
           </button>
           <button
-            className="bg-pink-700 text-white px-4 py-2 rounded-2xl font-bold hover:bg-pink-800 transition duration-300"
+            className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
             onClick={handleTopClick}
           >
             Best Selling Trending
           </button>
           <button
-            className="bg-pink-700 text-white px-4 py-2 rounded-2xl font-bold hover:bg-pink-800 transition duration-300"
+            className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
             onClick={handleProductsClick}
           >
             All Products
           </button>
           {user?.isAdmin === true ? (
             <Link to="/add">
-              <h3 className="text-center text-pink-900 text-xl font-bold">
+              <button
+                className="bg-pink-500 text-white mr-3  px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
+                onClick={handleProductsClick}
+              >
                 Add
-              </h3>
+              </button>
             </Link>
           ) : null}
         </div>
       </div>
       {cart ? (
-        <div
-          className={`  overflow-y-auto fixed top-0 left-0 h-full w-64 bg-pink-200 p-4  shadow-lg  max-transition-transform max-w-64 duration-300 ${
-            isSidebarOpen
-              ? "transform translate-x-0"
-              : "transform -translate-x-full ease-in"
-          }`}
-          style={{
-            zIndex: 9999999,
-            scrollbarWidth: "thin",
-            scrollbarColor: "#f472b6 #f9a8d4",
-            top: 93,
-            opacity: "100%",
-          }}
-        >
-          <div className="flex relative sticky justify-end">
-            <FontAwesomeIcon
-              icon={faTimes}
-              className="text-pink-800 text-lg cursor-pointer relative sticky"
-              onClick={handleSidebarClose}
-            />
-          </div>
-
-          <h2 className="text-pink-900 text-2xl font-bold m-4">Cart</h2>
-          {isLoadingSidebar ? (
-            <div className="p-4 flex items-center justify-center text-center ">
-              <div
-                className="border-t-4 border-pink-600 rounded-full animate-spin"
-                style={{ height: "10vw", width: "10vw" }}
-              ></div>
-            </div>
-          ) : (
-            <div className="">
-              {cart.map((item) => (
-                <div
-                  key={item._id}
-                  className="border p-2 border-pink-500  m-2 rounded-2xl shadow-xl  "
-                  style={{ width: "12vw", height: "13vw" }}
-                >
-                  <img
-                    src={`http://localhost:3900/${
-                      item.selectedForm
-                        ? item.forms[item.selectedForm].image_filename
-                        : item.forms[0].image_filename
-                    }`}
-                    className="h-100 w-full object-cover rounded-2xl"
-                    style={{ width: "11vw", height: "120px" }}
-                    alt="Product"
-                  />
-
-                  <div className="p-2">
-                    <h3 className="text-pink-800 font-semibold m-1">
-                      {item.title}
-                    </h3>
-                    <button className="bg-pink-500 text-white rounded-2xl px-4 py-2 hover:bg-pink-600 transition duration-300">
-                      View More
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <h1 className="mt-5 ml-8 text-pink-900 text-md font-semibold">
-                {" "}
-                subtotal: {""}
-                {cart.reduce((accumulator, product) => {
-                  return accumulator + product.price
-                }, 0)}
-              </h1>
-              <button
-                className="bg-pink-500 relative ml-8 mr-5 mt-2 bottom-0 text-white rounded-2xl px-4 py-2 hover:bg-pink-600 transition duration-300"
-                onClick={handleCheckout}
-              >
-                Check out.
-              </button>
-            </div>
-          )}
-        </div>
+        <Cart
+          cart={cart}
+          isSidebarOpen={isSidebarOpen}
+          faTimes={faTimes}
+          FontAwesomeIcon={FontAwesomeIcon}
+          handleSidebarClose={handleSidebarClose}
+          handleCheckout={handleCheckout}
+          isLoadingSidebar={isLoadingSidebar}
+        />
       ) : null}
     </nav>
   )

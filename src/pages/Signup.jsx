@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
+import axios from "axios"
 
 const Signup = () => {
   const navigate = useNavigate()
@@ -11,6 +12,8 @@ const Signup = () => {
   const [error, setError] = useState(null)
 
   const handleSubmit = async (e) => {
+    console.log("location.state.from:", location.state.from)
+
     e.preventDefault()
 
     // Create a user object with the form data
@@ -22,17 +25,13 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3900/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      })
+    const response = await axios.post('http://localhost:3900/api/users/', user, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
-      const data = await response.json()
-      console.log(data)
-
+  const data = response.data;
       // Sign-up successful, redirect to the homepage
       localStorage.setItem("token", data.token)
       localStorage.setItem(
@@ -43,15 +42,15 @@ const Signup = () => {
         })
       )
 
-      if (location.state?.from) {
-        navigate(location.state.from)
-      } else {
-        // If there's no original location, navigate to a default page
-        navigate("/")
-      }
+    if (location.state.from) {
+      navigate(location.state.from)
+    } else {
+      navigate("/")
+    }
+
     } catch (error) {
       console.log(error)
-      setError("An error occurred. Please try again later.", error)
+      setError(`An error occurred. Please try again later. ${error}`);
     }
   }
 

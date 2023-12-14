@@ -1,16 +1,5 @@
 const CACHE_NAME = "cache-v1"
 
-self.addEventListener("push", (e) => {
-  const data = e.data.json()
-  console.log("Push Data:", data)
-  self.registration.showNotification(data.title, {
-    body: data.body,
-    icon: data.icon,
-  })
-  console.log(data)
-  console.log("Push Received...")
-})
-
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {

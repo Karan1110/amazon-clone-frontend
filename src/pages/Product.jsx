@@ -10,29 +10,36 @@ const Product = () => {
   const [showRatings, setShowRatings] = useState(false)
   const [userRating, setUserRating] = useState(0)
   const { title } = useParams()
-  const [selectedSize, setSelectedSize] = useState(0)
+  const [selectedSize, setSelectedSize] = useState(1)
   const [selectedForm, setSelectedForm] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const history = useNavigate()
   const [selectedImage, setSelectedImage] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [quantity, setQuantity] = useState(1)
 
   // Function to handle image click and open the modal
   const handleImageClick = (imageURL) => {
     setIsModalOpen(true)
   }
+
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         await fetchProduct(title)
         setIsLoading(false)
+        // setSelectedImage(
+           // `http://localhost:3900/${product?.forms[0]?.image_filename}`
+        // )
+        console.log(typeof product.size)
       } catch (error) {
         console.error("Error fetching product data:", error.message)
         setIsLoading(false)
       }
     }
-
-    fetchProductData()
+    setTimeout(() => {
+      fetchProductData()
+    }, 3000)
   }, [title, fetchProduct])
 
   // Check if the product data is still loading or not available
@@ -75,6 +82,7 @@ const Product = () => {
         product_id: productId,
         form: selectedForm,
         size: selectedSize,
+        quantity: quantity,
       }),
     }
 
@@ -176,7 +184,7 @@ const Product = () => {
         </div>
       ) : (
         <>
-          <div className="p-0 overflow-hidden flex flex-start shadow-md mb-3">
+          <div className="p-0 overflow-hidden flex flex-start  mb-3">
             <div className="flex flex-col">
               {product.forms.map((form, index) => (
                 <>
@@ -213,7 +221,7 @@ const Product = () => {
                     : `http://localhost:3900/${product.forms[0].image_filename}`
                 }
                 alt="Product"
-                className="h-96 w-full object-cover m-6 shadow-2xl"
+                className="h-96 w-full object-cover m-6 "
                 style={{ height: "40vw", width: "35vw" }}
                 onClick={handleImageClick}
               />
@@ -225,47 +233,87 @@ const Product = () => {
 
                   <p className="text-pink-600 font-bold mt-1">Description</p>
                   {/* <br /> */}
-                  <p className="text-pink-600 font-semibold ">
-                    {product.description}
-                  </p>
-                  <p className="text-gray-400 font-semibold text-2xl m-2">
+                  <p
+                    className="text-pink-600"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
+                  <p className="text-gray-400 font-semibold text-lg  m-1">
                     Price : ${product.price}
                   </p>
-                  <p className="text-gray-500 font-bold text-2xl m-2">
+                  <p className="text-gray-500 font-bold text-lg  m-1">
                     Brand : {product.brand}
                   </p>
-                  <p className="text-gray-500 font-bold text-2xl m-2">
+                  <p className="text-gray-500 font-bold text-lg  m-1">
                     Category : {product.category}
                   </p>
                   <div className="mt-6 space-x-4">
-                    {product.size.map((size, index) => (
-                      <button
-                        key={size}
-                        className={`px-4 py-2  font-bold border-2 border-pink-500 text-gray font-semibold shadow-2xl m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
-                          index === selectedSize ? "bg-pink-700" : ""
-                        }`}
-                        onClick={() => setSelectedSize(index)}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                    {typeof product.size !== "object"
+                      ? JSON.parse(product.size).map((size, index) => (
+                          <button
+                            key={size}
+                            className={`px-4 py-2 m-2  font-bold border-2 border-pink-900 text-gray font-semibold shadow-md  m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
+                              index === selectedSize ? "bg-pink-500" : ""
+                            }`}
+                            onClick={() => {
+                              setSelectedSize(index)
+                            }}
+                          >
+                            {size}
+                          </button>
+                        ))
+                      : product.size.map((size, index) => (
+                          <button
+                            key={size}
+                            className={`px-4 py-2 m-2  font-bold border-2 border-pink-800 text-gray font-semibold shadow-2xl m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
+                              index === selectedSize ? "bg-pink-500" : ""
+                            }`}
+                            onClick={() => {
+                              setSelectedSize(index)
+                            }}
+                          >
+                            {size}
+                          </button>
+                        ))}
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <button
-                    className="w-full font-bold py-3 bg-pink-600 text-white rounded-2xl hover:bg-pink-700 transition duration-300"
+                    className="w-[15vw] font-bold py-3 bg-blue-500 text-white rounded-lg  hover:bg-pink-600 transition duration-300"
                     onClick={handleOrderClick}
                   >
                     Order Now
                   </button>
                   <button
-                    className="w-full font-bold font-size py-3 mt-3 bg-pink-600 text-white rounded-2xl hover:bg-pink-700 transition duration-300"
+                    className="w-[15vw] font-bold font-size py-3 mt-3 ml-2  bg-blue-500 text-white rounded-lg  hover:bg-pink-600 transition duration-300"
                     onClick={() => handleCartClick()}
                   >
                     Add to Cart
                   </button>
-                  <h3 className="font-bold text-xl text-pink-600 text-center m-2">
+                  <div class="inline-flex m-2 border h-[40px] rounded-md">
+                    <div
+                      class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-2xl font-bold py-2 px-4 rounded-l"
+                      onClick={() => {
+                        setQuantity((prev) => prev + 1)
+                        console.log(typeof product.size)
+                      }}
+                    >
+                      +
+                    </div>
+                    <p className="font-bold w-[20px] m-4 mb-2  text-lg text-pink-600">
+                      {quantity}
+                    </p>
+
+                    <div
+                      class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-2xl  font-bold py-2 px-4 rounded-r"
+                      onClick={() => {
+                        setQuantity((prev) => prev - 1)
+                      }}
+                    >
+                      -
+                    </div>
+                  </div>
+                  <h3 className="font-bold text-xl text-pink-600 text-left mt-4">
                     {" "}
                     Ratings{" "}
                   </h3>
@@ -312,20 +360,20 @@ const Product = () => {
               </div>
             </div>
           </div>
-          <div className="border-b border-pink-500 my-4"></div>
-          <h2 className="text-pink-900 text-2xl m-5 font-bold">
+          <div className="border-b border-pink-500 my-4 shadow-lg"></div>
+          <h2 className="text-pink-900 text-2xl m-3 font-bold">
             Recommended Products
           </h2>
           <div className="flex flex-wrap justify-start">
             {recommendedProducts.map((product) => (
               <div
                 key={product._id}
-                className="border border-pink-500 mb-4 rounded-2xl py-4 mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-                style={{ width: "20vw", height: "30vw" }}
+                className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
+                style={{ width: "20vw", height: "32.5vw" }}
               >
                 <img
                   src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                  className="h-100 w-full object-cover rounded-2xl"
+                  className="h-100 w-full object-cover rounded-t-2xl"
                   style={{ height: "15vw", width: "20vw" }}
                   alt={product.title}
                 />
@@ -333,7 +381,10 @@ const Product = () => {
                   <h3 className="text-pink-800 text-xl font-semibold mb-2">
                     {product.title}
                   </h3>
-                  <p className="text-pink-600 ">{product.description}</p>
+                  <p
+                    className="text-pink-600"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
                   <p className="text-gray-400 font-semibold text-lg">
                     ${product.price}
                   </p>
@@ -344,12 +395,12 @@ const Product = () => {
                     Category : {product.category}
                   </p>
                   <Link to={`/product/${product._id}`}>
-                    <button className="bg-pink-500 text-white rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
+                    <button className="bg-pink-500 font-semibold text-white rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
                       View More
                     </button>
                   </Link>
                   <button
-                    className="bg-pink-500 text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
+                    className="bg-pink-500 font-semibold text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
                     onClick={() => {
                       // Handle add to cart click here
                     }}

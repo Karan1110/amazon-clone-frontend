@@ -43,7 +43,11 @@ const SideBar = () => {
   }, [])
 
   return (
-    <div className="w-200 h-100vw bg-white shadow-2xl overflow-hidden relative z-index-0">
+    <div className="w-200 h-100vw bg-white shadow-2xl overflow-hidden relative"
+      style={{
+      zIndex : -99999999999999
+    }}
+    >
       <div
         className="flex transition-transform duration-500 ease-in-out"
         style={{
@@ -54,8 +58,8 @@ const SideBar = () => {
         <img
           src={images[currentImage]}
           alt={`Image-${currentImage + 1}`}
-          className="w-full object-cover z-index-0"
-          style={{ height: "40vw", width: "100vw" }}
+          className="w-full object-cover "
+          style={{ height: "40vw", width: "100vw" ,zIndex : -9999999999999}}
         />
       </div>
       <button

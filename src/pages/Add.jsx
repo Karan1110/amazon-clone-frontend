@@ -1,5 +1,7 @@
-import React, { useState } from "react"
+// "db": "mongodb+srv://karan5ipsvig:password123abc@cluster0.yar2cct.mongodb.net/ecom?retryWrites=true&w=majority",
 import axios from "axios"
+import React, { useState, useRef, useMemo } from "react"
+import JoditEditor from "jodit-react"
 
 const Add = () => {
   const [product, setProduct] = useState({
@@ -10,6 +12,7 @@ const Add = () => {
     description: "",
     brand: "",
     numberInStock: 0,
+    size: [],
   })
 
   const handleChange = (e) => {
@@ -44,7 +47,6 @@ const Add = () => {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
     try {
       const formData = new FormData()
 
@@ -56,17 +58,15 @@ const Add = () => {
         formData.append("photos", photo)
       })
 
-      // Convert the 'myForms' array to JSON and append it as a single array field 'forms'
       const myForms = product.forms.map((form) => ({ name: form.name }))
       formData.append("forms", JSON.stringify(myForms))
-
-      // Append other product details
       formData.append("title", product.title)
       formData.append("description", product.description)
       formData.append("price", product.price)
       formData.append("category", product.category)
       formData.append("brand", product.brand)
       formData.append("numberInStock", product.numberInStock)
+      formData.append("size", JSON.stringify(product.size));
 
       // Make a POST request to your API endpoint using Axios
       const response = await axios.post(
@@ -94,7 +94,25 @@ const Add = () => {
     }
     setProduct({ ...product, forms: updatedForms })
   }
+  const handleSizeChange = (index, value) => {
+    setProduct((prevProduct) => {
+      const newSize = [...prevProduct.size]
+      newSize[index] = value
+      return { ...prevProduct, size: newSize }
+    })
+  }
 
+  const handleAddSize = () => {
+    setProduct({ ...product, size: [...product.size, ""] })
+  }
+
+  const handleRemoveSize = (index) => {
+    const newSize = [...product.size]
+    newSize.splice(index, 1)
+    setProduct({ ...product, size: newSize })
+  }
+
+  const editor = useRef(null)
   return (
     <div className="bg-pink-200 p-4">
       <div className="max-w-md mx-auto bg-white rounded p-8 shadow-lg">
@@ -150,7 +168,7 @@ const Add = () => {
           <button
             type="button"
             onClick={addForm}
-            className="bg-pink-500 text-white py-2 px-4 rounded hover:bg-pink-700"
+            className="bg-pink-500 text-white py-2 m-2 px-4 rounded hover:bg-pink-700"
           >
             Add Form
           </button>
@@ -170,12 +188,18 @@ const Add = () => {
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Description:
             </label>
-            <textarea
-              name="description"
+            <JoditEditor
+              ref={editor}
               value={product.description}
-              onChange={handleChange}
-              className="border border-gray-400 rounded w-full py-2 px-3 h-32 resize-none"
-            ></textarea>
+              tabIndex={1}
+              onBlur={(newContent) =>
+                setProduct({ ...product, description: newContent })
+              }
+              onChange={(newContent) => {
+                console.log(product.description)
+                setProduct({ ...product, description: newContent })
+              }}
+            />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -189,6 +213,31 @@ const Add = () => {
               className="border border-gray-400 rounded w-full py-2 px-3"
             />
           </div>
+          {product.size.map((size, index) => (
+            <div key={index}>
+              <input
+                type="text"
+                placeholder="Size"
+                className="border border-gray-400 rounded w-full   py-2 px-3"
+                value={size}
+                onChange={(e) => handleSizeChange(index, e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveSize(index)}
+                className="bg-pink-500 text-white py-2 px-4 m-2 rounded hover:bg-pink-700"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="bg-pink-500 text-white m-2 py-2 px-4 rounded hover:bg-pink-700"
+            onClick={handleAddSize}
+          >
+            Add Size
+          </button>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Category:

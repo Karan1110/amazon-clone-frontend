@@ -65,19 +65,22 @@ const Products = () => {
         {products
           ? products.map((product) => (
               <div
-                className="border border-pink-500 mb-4 rounded-2xl py-4 mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-                style={{ width: "20vw", height: "30vw" }}
+                className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
+                style={{ width: "20vw", height: "32.5vw" }}
               >
                 <img
                   src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                  className="h-100 w-full object-cover rounded-2xl"
+                  className="h-100 w-full object-cover rounded-t-2xl "
                   style={{ height: "15vw", width: "20vw" }}
                 />
                 <div className="p-4">
                   <h3 className="text-pink-800 text-xl font-semibold mb-2">
                     {product.title}
-                  </h3>
-                  <p className="text-pink-600 ">{product.description}</p>
+                  </h3>{" "}
+                  <p
+                    className="text-pink-600"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
                   <p className="text-gray-400 font-semibold text-lg">
                     ${product.price}
                   </p>
@@ -88,12 +91,12 @@ const Products = () => {
                     category : {product.category}
                   </p>
                   <Link to={`/product/${product._id}`}>
-                    <button className="bg-pink-500 text-white rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
+                    <button className="bg-pink-500 text-white font-semibold  rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
                       View More
                     </button>
                   </Link>
                   <button
-                    className="bg-pink-500 text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
+                    className="bg-pink-500 text-white font-semibold rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
                     id="my_button"
                     onClick={() => {
                       sendCartFetchRequest(
@@ -117,19 +120,22 @@ const Products = () => {
         {trending_products
           ? trending_products.map((product) => (
               <div
-                className="border border-pink-500 mb-4 rounded-2xl py-4 mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-                style={{ width: "20vw", height: "30vw" }}
+                className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
+                style={{ width: "20vw", height: "32.5vw" }}
               >
                 <img
                   src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                  className="h-100 w-full object-cover rounded-2xl"
+                  className="h-100 w-full object-cover rounded-t-2xl"
                   style={{ height: "15vw", width: "20vw" }}
                 />
                 <div className="p-4">
                   <h3 className="text-pink-800 text-xl font-semibold mb-2">
                     {product.title}
                   </h3>
-                  <p className="text-pink-600 mb-1">{product.description}</p>
+                  <p
+                    className="text-pink-600"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
                   <p className="text-gray-400 font-semibold text-lg">
                     ${product.price}
                   </p>
@@ -140,12 +146,12 @@ const Products = () => {
                     category : {product.category}
                   </p>
                   <Link to={`/product/${product._id}`}>
-                    <button className="bg-pink-500 text-white rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
-                      View Morer
+                    <button className="bg-pink-500 text-white font-semibold rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
+                      View More
                     </button>
                   </Link>
                   <button
-                    className="bg-pink-500 text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
+                    className="bg-pink-500 text-white font-semibold  rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
                     onClick={() => {
                       sendCartFetchRequest(
                         product._id,
@@ -168,19 +174,22 @@ const Products = () => {
         {top_products
           ? top_products.map((product) => (
               <div
-                className="border border-pink-500 mb-4 rounded-2xl py-4 mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-                style={{ width: "20vw", height: "30vw" }}
+                className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
+                style={{ width: "20vw", height: "32.5vw" }}
               >
                 <img
                   src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                  className="h-100 w-full object-cover rounded-2xl"
+                  className="h-100 w-full object-cover rounded-t-2xl "
                   style={{ height: "15vw", width: "20vw" }}
                 />
                 <div className="p-4">
                   <h3 className="text-pink-800 text-xl font-semibold mb-2">
                     {product.title}
                   </h3>
-                  <p className="text-pink-600 mb-1">{product.description}</p>
+                  <p
+                    className="text-pink-600"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
                   <p className="text-gray-400 font-semibold text-lg">
                     ${product.price}
                   </p>
@@ -191,12 +200,12 @@ const Products = () => {
                     category : {product.category}
                   </p>
                   <Link to={`/product/${product._id}`}>
-                    <button className="bg-pink-500 text-white rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
+                    <button className="bg-pink-500 text-white font-semibold rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
                       View More
                     </button>
                   </Link>
                   <button
-                    className="bg-pink-500 text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
+                    className="bg-pink-500 font-semibold text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
                     onClick={() => {
                       sendCartFetchRequest(
                         product._id,

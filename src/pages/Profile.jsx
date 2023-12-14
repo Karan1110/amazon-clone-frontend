@@ -10,6 +10,9 @@ const Profile = () => {
   const user = useStore((state) => state.user)
   const navigate = useNavigate()
 
+   if (!localStorage.getItem("token")) {
+      navigate("/signup", { state: { from: window.location.pathname } })
+    }
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false)
