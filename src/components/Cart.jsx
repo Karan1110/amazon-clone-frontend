@@ -15,11 +15,9 @@ const Cart = ({
           : "transform -translate-x-full ease-in"
       }`}
       style={{
-        zIndex: 9999999,
+        zIndex: 999999999999999999,
         scrollbarWidth: "thin",
         scrollbarColor: "#f472b6 #f9a8d4",
-        // top: 93,
-        opacity: "100%",
       }}
     >
       <div className="flex relative inline-block sticky justify-end">

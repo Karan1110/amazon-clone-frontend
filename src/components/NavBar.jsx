@@ -85,24 +85,35 @@ const NavBar = () => {
   }
   const handleTrendingClick = () => {
     // Use smooth scrolling to scroll to the trending section
-    document.getElementById("trending").scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    })
+    const tp = document.getElementById("trending")
+    if (tp) {
+      tp.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }
   }
   const handleTopClick = () => {
     // Use smooth scrolling to scroll to the trending section
-    document.getElementById("top").scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    })
+    const top = document.getElementById("top")
+    if (top) {
+      top.scrollIntoView({
+        block: "start",
+        behavior: "smooth",
+      })
+    }
   }
+
   const handleProductsClick = () => {
     // Use smooth scrolling to scroll to the trending section
-    document.getElementById("products").scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    })
+    const products = document.getElementById("products")
+
+    if (products) {
+      products.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }
   }
   useEffect(() => {
     // Simulate loading the sidebar content
@@ -114,7 +125,7 @@ const NavBar = () => {
   }, [isSidebarOpen])
 
   return (
-    <nav className="bg-white shadow-2xl mr-1 ml-1 mt-1 rounded-2xl fixed top-0   p-2 md:sticky md:top-0 ">
+    <nav className="bg-white shadow-2xl   fixed top-0  mb-1  p-2 md:sticky md:top-0 ">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/profile">
@@ -172,19 +183,19 @@ const NavBar = () => {
         </div>
         <div className="flex items-center space-x-6">
           <button
-            className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
+            className=" text-pink-500 text-xl font-semibold hover:text-pink-900 transition duration-300"
             onClick={handleTrendingClick}
           >
             Trending
           </button>
           <button
-            className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
+            className=" text-pink-500 text-xl font-semibold  hover:text-pink-900 transition duration-300"
             onClick={handleTopClick}
           >
-            Best Selling Trending
+            Best Selling
           </button>
           <button
-            className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
+            className=" text-pink-500 text-xl  font-semibold hover:text-pink-900 transition duration-300"
             onClick={handleProductsClick}
           >
             All Products
@@ -192,10 +203,20 @@ const NavBar = () => {
           {user?.isAdmin === true ? (
             <Link to="/add">
               <button
-                className="bg-pink-500 text-white mr-3  px-4 py-2 rounded-lg font-bold hover:bg-pink-600 transition duration-300"
+                className=" text-pink-500 text-xl  font-semibold  hover:text-pink-900 transition duration-300"
                 onClick={handleProductsClick}
               >
                 Add
+              </button>
+            </Link>
+          ) : null}
+          {user?.isAdmin === true ? (
+            <Link to="/Orders">
+              <button
+                className=" text-pink-500 text-xl font-semibold  hover:text-pink-900 transition duration-300"
+                onClick={handleProductsClick}
+              >
+                Orders
               </button>
             </Link>
           ) : null}

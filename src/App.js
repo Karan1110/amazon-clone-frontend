@@ -13,6 +13,7 @@ import Login from "./pages/Login"
 import Add from "./pages/Add"
 import NavBar from "./components/NavBar"
 import Footer from "./components/Footer"
+import Orders from "./pages/Orders.jsx"
 import "./App.css"
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/product/:title" element={<Product />} />
           <Route path="/products/:type" element={<Products />} />
           <Route path="/order/:id/:size/:form" element={<Order />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/failed" element={<Failed />} />
           <Route path="/success" element={<Success />} />
           <Route path="/add" element={<Add />} />

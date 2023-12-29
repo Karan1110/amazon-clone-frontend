@@ -10,7 +10,7 @@ const Product = () => {
   const [showRatings, setShowRatings] = useState(false)
   const [userRating, setUserRating] = useState(0)
   const { title } = useParams()
-  const [selectedSize, setSelectedSize] = useState(1)
+  const [selectedSize, setSelectedSize] = useState(0)
   const [selectedForm, setSelectedForm] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const history = useNavigate()
@@ -28,9 +28,6 @@ const Product = () => {
       try {
         await fetchProduct(title)
         setIsLoading(false)
-        // setSelectedImage(
-           // `http://localhost:3900/${product?.forms[0]?.image_filename}`
-        // )
         console.log(typeof product.size)
       } catch (error) {
         console.error("Error fetching product data:", error.message)
@@ -39,11 +36,24 @@ const Product = () => {
     }
     setTimeout(() => {
       fetchProductData()
+        .then(() => {
+          setSelectedImage(
+            `http://localhost:3900/${product.forms[0].image_filename}`
+          )
+        })
+        .catch((ex) => {
+          console.log(ex, "error at fetch product data")
+        })
     }, 3000)
   }, [title, fetchProduct])
 
   // Check if the product data is still loading or not available
-  if (isLoading || product?.forms[0]?.image_filename === null || undefined) {
+  if   (isLoading ||
+  !product ||
+  !product.forms ||
+  !product.forms[0] ||
+  product.forms[0]?.image_filename === null ||
+  product.forms[0]?.image_filename === undefined ){
     return (
       // Skeleton Loading UI or other loading state
       // You can customize this part as needed
@@ -291,7 +301,7 @@ const Product = () => {
                     Add to Cart
                   </button>
                   <div class="inline-flex m-2 border h-[40px] rounded-md">
-                    <div
+                    <button
                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-2xl font-bold py-2 px-4 rounded-l"
                       onClick={() => {
                         setQuantity((prev) => prev + 1)
@@ -299,19 +309,19 @@ const Product = () => {
                       }}
                     >
                       +
-                    </div>
+                    </button>
                     <p className="font-bold w-[20px] m-4 mb-2  text-lg text-pink-600">
                       {quantity}
                     </p>
 
-                    <div
+                    <button
                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-2xl  font-bold py-2 px-4 rounded-r"
                       onClick={() => {
                         setQuantity((prev) => prev - 1)
                       }}
                     >
                       -
-                    </div>
+                    </button>
                   </div>
                   <h3 className="font-bold text-xl text-pink-600 text-left mt-4">
                     {" "}

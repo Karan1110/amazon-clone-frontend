@@ -66,7 +66,7 @@ const Add = () => {
       formData.append("category", product.category)
       formData.append("brand", product.brand)
       formData.append("numberInStock", product.numberInStock)
-      formData.append("size", JSON.stringify(product.size));
+      formData.append("size", JSON.stringify(product.size))
 
       // Make a POST request to your API endpoint using Axios
       const response = await axios.post(
@@ -114,7 +114,7 @@ const Add = () => {
 
   const editor = useRef(null)
   return (
-    <div className="bg-pink-200 p-4">
+    <div className=" p-4 mt-3">
       <div className="max-w-md mx-auto bg-white rounded p-8 shadow-lg">
         <h2 className="text-2xl font-semibold text-center mb-4">Add Product</h2>
         <form onSubmit={handleSubmit}>
@@ -159,7 +159,7 @@ const Add = () => {
               <button
                 type="button"
                 onClick={() => removeForm(index)}
-                className="text-red-500 mt-2 hover:text-red-700"
+                className="text-red-500 mt-2 text-bold hover:text-red-700"
               >
                 Remove Form
               </button>
@@ -168,7 +168,7 @@ const Add = () => {
           <button
             type="button"
             onClick={addForm}
-            className="bg-pink-500 text-white py-2 m-2 px-4 rounded hover:bg-pink-700"
+            className="bg-pink-500 text-white text-bold py-2 m-2 px-4 text-semibold rounded hover:bg-pink-700"
           >
             Add Form
           </button>
@@ -233,7 +233,7 @@ const Add = () => {
           ))}
           <button
             type="button"
-            className="bg-pink-500 text-white m-2 py-2 px-4 rounded hover:bg-pink-700"
+            className="bg-pink-500 text-white m-2 py-2 px-4 rounded text-semibold  hover:bg-pink-700"
             onClick={handleAddSize}
           >
             Add Size
@@ -277,7 +277,7 @@ const Add = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="bg-pink-500 text-white py-2 px-4 rounded hover:bg-pink-700"
+              className="bg-pink-500 text-white py-2 px-4 text-semibold rounded hover:bg-pink-700"
             >
               Add Product
             </button>

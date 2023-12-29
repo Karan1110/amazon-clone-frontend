@@ -22,19 +22,19 @@ const Footer = () => {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="text-blue-900 hover:text-pink-100 transition duration-300"
+                className="text-blue-900 hover:text-pink-500 transition duration-300"
               >
                 Facebook
               </a>
               <a
                 href="#"
-                className="text-blue-900 hover:text-pink-100 transition duration-300"
+                className="text-blue-900 hover:text-pink-500 transition duration-300"
               >
                 Twitter
               </a>
               <a
                 href="#"
-                className="text-blue-900 hover:text-pink-100 transition duration-300"
+                className="text-blue-900 hover:text-pink-500 transition duration-300"
               >
                 Instagram
               </a>
