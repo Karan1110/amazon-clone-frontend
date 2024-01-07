@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import useProductStore from "../store/index"
+import ProductCard from "./ProductCard"
+import { StarRating } from "./ProductCard"
+import axios from "axios"
 
 const Product = () => {
   const recommendedProducts = useProductStore((state) => state.top_products)
   const product = useProductStore((state) => state.product)
   const addRating = useProductStore((state) => state.addRating)
+  const addToCart = useProductStore((state) => state.addToCart)
   const fetchProduct = useProductStore((state) => state.fetchProduct)
   const [showRatings, setShowRatings] = useState(false)
   const [userRating, setUserRating] = useState(0)
@@ -17,7 +21,11 @@ const Product = () => {
   const [selectedImage, setSelectedImage] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [quantity, setQuantity] = useState(1)
-
+  const [avgRating, setAvgRating] = useState(5)
+  const [error, setError] = useState(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+  const [review, setReview] = useState("")
   // Function to handle image click and open the modal
   const handleImageClick = (imageURL) => {
     setIsModalOpen(true)
@@ -26,34 +34,40 @@ const Product = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        await fetchProduct(title)
-        setIsLoading(false)
-        console.log(typeof product.size)
+        const productData = await fetchProduct(title)
+        if (productData && productData.forms && productData.forms[0]) {
+          const totalRatings = productData.ratings.length
+          setAvgRating(
+            totalRatings > 0
+              ? productData.ratings.reduce(
+                  (sum, rating) => sum + rating.rating,
+                  0
+                ) / totalRatings
+              : 0
+          )
+          setSelectedImage(
+            `http://localhost:3900/${productData.forms[0].image_filename}`
+          )
+        }
       } catch (error) {
         console.error("Error fetching product data:", error.message)
+      } finally {
         setIsLoading(false)
       }
     }
-    setTimeout(() => {
-      fetchProductData()
-        .then(() => {
-          setSelectedImage(
-            `http://localhost:3900/${product.forms[0].image_filename}`
-          )
-        })
-        .catch((ex) => {
-          console.log(ex, "error at fetch product data")
-        })
-    }, 3000)
-  }, [title, fetchProduct])
+
+    fetchProductData()
+  }, [fetchProduct, title]) // Include fetchProduct and title in the dependency array
 
   // Check if the product data is still loading or not available
-  if   (isLoading ||
-  !product ||
-  !product.forms ||
-  !product.forms[0] ||
-  product.forms[0]?.image_filename === null ||
-  product.forms[0]?.image_filename === undefined ){
+  if (
+    isLoading ||
+    !product ||
+    !product.forms || // Add a check for product.forms
+    (product.forms && !product.forms[0]) ||
+    product.forms[0]?.image_filename === null ||
+    product.forms[0]?.image_filename === undefined
+  ) {
     return (
       // Skeleton Loading UI or other loading state
       // You can customize this part as needed
@@ -143,11 +157,34 @@ const Product = () => {
     // Set the cartDataString in the local storage with the key "cart"
     localStorage.setItem("cart", cartDataString)
   }
+  const handleSvgClick = () => {
+    setError(null)
+  }
+
+  const handleRatingLike = async (id, index) => {
+    try {
+      await axios.post(
+        `http://localhost:3900/api/products/${product._id}/rating/like/${id}`,
+        {},
+        {
+          headers: {
+            "x-auth-token": localStorage.getItem("token"),
+          },
+        }
+      )
+
+      product.ratings[index].likes++
+    } catch (ex) {
+      setError(ex.message)
+      console.log(ex)
+    }
+  }
 
   const handleAddRating = async () => {
     if (!localStorage.getItem("token")) {
       history("/signup", { state: { from: window.location.pathname } })
     }
+
     console.log(localStorage.getItem("user"))
     if (userRating > 0 && userRating <= 5) {
       // Create a new rating object and add it to the existing ratings list
@@ -157,7 +194,7 @@ const Product = () => {
         user: user.name || "Anonymous",
       }
       console.log(product._id, userRating)
-      await addRating(product._id, userRating)
+      await addRating(product._id, userRating, review)
       product.ratings.push(newRating)
       setShowRatings(true) // Show the ratings section after adding a new rating
       setUserRating(0) // Reset the input field
@@ -196,28 +233,29 @@ const Product = () => {
         <>
           <div className="p-0 overflow-hidden flex flex-start  mb-3">
             <div className="flex flex-col">
-              {product.forms.map((form, index) => (
-                <>
-                  <button
-                    key={form.id} // Make sure to add the "key" prop when using a dynamic list
-                    onClick={() => {
-                      handleAttributeChange(form.image_filename)
-                      setSelectedForm(index)
-                    }}
-                    className={`py-2 px-4 bg-pink-600 font-bold text-white hover:bg-pink-700 transition duration-300 relative bottom-0 mb-30 m-3 p-1 rounded-lg
-                  ${index === selectedForm ? "border-2 border-pink-500" : ""}`}
-                    style={{
-                      width: "7vw",
-                      height: "5vw",
-                      backgroundImage: `url(http://localhost:3900/${form.image_filename})`,
-                      backgroundSize: "cover",
-                    }}
-                  ></button>
-                  <div className="text-center text-pink-900 font-semibold">
-                    {form.name}
-                  </div>
-                </>
-              ))}
+              {product.forms &&
+                product.forms.map((form, index) => (
+                  <>
+                    <button
+                      key={form.id} // Make sure to add the "key" prop when using a dynamic list
+                      onClick={() => {
+                        handleAttributeChange(form.image_filename)
+                        setSelectedForm(index)
+                      }}
+                      className={`py-1 px-1 z-0 font-bold text-white  transition duration-300 relative bottom-0 mb-30 m-3 p-1 
+                  ${index === selectedForm ? "border border-pink-500" : ""}`}
+                      style={{
+                        width: "80px",
+                        height: "100px",
+                        backgroundImage: `url(http://localhost:3900/${form.image_filename})`,
+                        backgroundSize: "cover",
+                      }}
+                    ></button>
+                    <div className="text-center text-pink-900 font-semibold">
+                      {form.name}
+                    </div>
+                  </>
+                ))}
             </div>
 
             <div
@@ -237,31 +275,69 @@ const Product = () => {
               />
               <div className="p-4 flex  flex-col ">
                 <div className="mb-3">
+                  {error && (
+                    <div
+                      className="bg-red-100 border m-5 ml-0 border-red-400 text-red-700 px-4 py-3 rounded relative"
+                      role="alert"
+                    >
+                      <span className="block sm:inline">{error}</span>
+                      <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg
+                          className="fill-current h-6 w-6 text-red-500"
+                          onClick={handleSvgClick}
+                          role="button"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                        >
+                          <title>Close</title>
+                          <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                        </svg>
+                      </span>
+                    </div>
+                  )}
                   <h1 className="text-3xl font-bold text-pink-800">
                     {product.title}
                   </h1>
-
-                  <p className="text-pink-600 font-bold mt-1">Description</p>
-                  {/* <br /> */}
                   <p
-                    className="text-pink-600"
+                    className="text-pink-600 py-5 px-2 max-w-xl "
                     dangerouslySetInnerHTML={{ __html: product.description }}
                   />
-                  <p className="text-gray-400 font-semibold text-lg  m-1">
-                    Price : ${product.price}
+                  <div className="border p-2 my-3 ml-2 px-2 py-2 w-64">
+                    <p className=" font-bold text-lg    text-pink-700   border-b m-1">
+                      Price : ₹{product.price}
+                    </p>
+                    <p className=" font-bold py-2    text-pink-700  text-lg border-b  m-1">
+                      {" "}
+                      Brand : {product.brand}
+                    </p>
+                    <p className=" font-bold py-2    text-pink-700  text-lg border-b  m-1">
+                      {" "}
+                      Stock: {product.numberInStock}
+                    </p>
+                    <p className=" font-bold text-lg    text-pink-700   m-1">
+                      Category : {product.category}
+                    </p>
+                  </div>
+                  <p className=" font-bold text-lg    text-pink-700   ml-2 ">
+                    Available colors :{" "}
                   </p>
-                  <p className="text-gray-500 font-bold text-lg  m-1">
-                    Brand : {product.brand}
-                  </p>
-                  <p className="text-gray-500 font-bold text-lg  m-1">
-                    Category : {product.category}
-                  </p>
+
+                  <div className="flex  ml-2 flex-row space-x-1">
+                    {" "}
+                    {product.color.map((color) => (
+                      <div
+                        style={{ backgroundColor: color }}
+                        className={` w-7 h-7 rounded-full `}
+                      ></div>
+                    ))}
+                  </div>
                   <div className="mt-6 space-x-4">
                     {typeof product.size !== "object"
-                      ? JSON.parse(product.size).map((size, index) => (
+                      ? product.size &&
+                        JSON.parse(product.size).map((size, index) => (
                           <button
                             key={size}
-                            className={`px-4 py-2 m-2  font-bold border-2 border-pink-900 text-gray font-semibold shadow-md  m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
+                            className={`px-4 py-2 m-2  font-bold border-2 border-white text-gray  shadow-md   rounded-md hover:bg-pink-800 transition duration-300  ${
                               index === selectedSize ? "bg-pink-500" : ""
                             }`}
                             onClick={() => {
@@ -271,10 +347,11 @@ const Product = () => {
                             {size}
                           </button>
                         ))
-                      : product.size.map((size, index) => (
+                      : product.size &&
+                        product.size.map((size, index) => (
                           <button
                             key={size}
-                            className={`px-4 py-2 m-2  font-bold border-2 border-pink-800 text-gray font-semibold shadow-2xl m-2 rounded-md hover:bg-pink-700 transition duration-300  ${
+                            className={`px-4 py-2   font-bold border-2 border-pink-800 text-gray  shadow-2xl m-2 rounded-md hover:bg-pink-800 transition duration-300  ${
                               index === selectedSize ? "bg-pink-500" : ""
                             }`}
                             onClick={() => {
@@ -289,83 +366,235 @@ const Product = () => {
 
                 <div className="mt-4">
                   <button
-                    className="w-[15vw] font-bold py-3 bg-blue-500 text-white rounded-lg  hover:bg-pink-600 transition duration-300"
                     onClick={handleOrderClick}
+                    type="button"
+                    class="text-white bg-pink-700 hover:bg-pink-800 focus:ring-4 focus:outline-none focus:ring-pink-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
-                    Order Now
+                    Buy now
                   </button>
                   <button
-                    className="w-[15vw] font-bold font-size py-3 mt-3 ml-2  bg-blue-500 text-white rounded-lg  hover:bg-pink-600 transition duration-300"
-                    onClick={() => handleCartClick()}
+                    onClick={handleCartClick}
+                    type="button"
+                    class="text-white bg-pink-700 hover:bg-pink-800 focus:ring-4 focus:outline-none focus:ring-pink-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
+                    <svg
+                      class="w-3.5 h-3.5 me-2"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 18 21"
+                    >
+                      <path d="M15 12a1 1 0 0 0 .962-.726l2-7A1 1 0 0 0 17 3H3.77L3.175.745A1 1 0 0 0 2.208 0H1a1 1 0 0 0 0 2h.438l.6 2.255v.019l2 7 .746 2.986A3 3 0 1 0 9 17a2.966 2.966 0 0 0-.184-1h2.368c-.118.32-.18.659-.184 1a3 3 0 1 0 3-3H6.78l-.5-2H15Z" />
+                    </svg>
                     Add to Cart
                   </button>
-                  <div class="inline-flex m-2 border h-[40px] rounded-md">
+                  <div className="inline-flex m-2 border h-[40px] rounded-md">
                     <button
-                      class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-2xl font-bold py-2 px-4 rounded-l"
-                      onClick={() => {
-                        setQuantity((prev) => prev + 1)
-                        console.log(typeof product.size)
-                      }}
+                      type="button"
+                      id="decrement-button"
+                      data-input-counter-decrement="quantity-input"
+                      className="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
+                      onClick={() => setQuantity((prev) => prev - 1)}
                     >
-                      +
+                      <svg
+                        className="w-3 h-3 text-gray-900 dark:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 2"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M1 1h16"
+                        />
+                      </svg>
                     </button>
-                    <p className="font-bold w-[20px] m-4 mb-2  text-lg text-pink-600">
-                      {quantity}
-                    </p>
+
+                    <input
+                      type="text"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                      id="quantity-input"
+                      data-input-counter
+                      aria-describedby="helper-text-explanation"
+                      className="bg-gray-50 border-x-0 w-10 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="1"
+                      required
+                    />
 
                     <button
-                      class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-2xl  font-bold py-2 px-4 rounded-r"
-                      onClick={() => {
-                        setQuantity((prev) => prev - 1)
-                      }}
+                      type="button"
+                      onClick={() => setQuantity((prev) => prev + 1)}
+                      id="increment-button"
+                      data-input-counter-increment="quantity-input"
+                      className="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
                     >
-                      -
+                      <svg
+                        className="w-3 h-3 text-gray-900 dark:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 18"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 1v16M1 9h16"
+                        />
+                      </svg>
                     </button>
                   </div>
-                  <h3 className="font-bold text-xl text-pink-600 text-left mt-4">
-                    {" "}
-                    Ratings{" "}
-                  </h3>
-                  <div className="grid grid-cols-3">
-                    {/* Existing ratings */}
-                    {product.ratings.map((rating, index) => (
-                      <div
-                        key={index}
-                        className="bg-pink-100  p-4 m-4 rounded-2xl "
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                            {rating.rating}
+
+                  <div className="block m-5 ml-0">
+                    <StarRating averageRating={avgRating} />
+                  </div>
+                  <button
+                    onClick={() => {
+                      const currentUser = localStorage.getItem("user")
+                        ? JSON.parse(localStorage.getItem("user"))
+                        : null
+
+                      const hasUserRated =
+                        product.ratings &&
+                        product.ratings.some(
+                          (rating) => rating.user.name === currentUser?.name
+                        )
+
+                      // Now you can use hasUserRated in your logic
+                      if (hasUserRated) {
+                        setError("You have already rated this product...")
+                        return
+                      }
+                      setIsOpen(!isOpen)
+                    }}
+                    className="block text-white bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:outline-none focus:ring-pink-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  >
+                    Add Rating
+                  </button>
+
+                  {isOpen && (
+                    <div className="fixed top-0 right-0 bottom-0 left-0 flex items-center justify-center z-50">
+                      <div className="bg-white p-8 rounded-md shadow-md w-[700px] h-[500px]">
+                        <div className=" p-2 rounded-2xl flex items-center justify-center text-center mb-4">
+                          <div className="flex  flex-col items-center justify-center  space-x-5 space-y-5">
+                            <label
+                              for="number-input"
+                              className="block mb-2 text-lg font-medium text-gray-900 dark:text-white"
+                            >
+                              Your Rating
+                            </label>
+                            <input
+                              type="number"
+                              id="number-input"
+                              aria-describedby="helper-text-explanation"
+                              className=" w-[450px] bg-gray-50 focus:ring-blue-500  border-2  text-gray-900 text-sm rounded-lg  focus:border-blue-500 block  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-blue-500"
+                              placeholder="upto 5..."
+                              required
+                              value={userRating}
+                              onChange={(e) => setUserRating(e.target.value)}
+                            />
+
+                            <label
+                              for="message"
+                              className="block mb-2 text-lg  font-medium text-gray-900 dark:text-white"
+                            >
+                              Your Review
+                            </label>
+                            <textarea
+                              id="message"
+                              rows="4"
+                              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              placeholder="Write your thoughts here..."
+                              onChnage={(e) => setReview(e.target.value)}
+                              value={review}
+                            ></textarea>
+
+                            <button
+                              className="bg-pink-600 text-white rounded-2xl px-4 py-2 hover:bg-pink-800 transition duration-300"
+                              onClick={async () => await handleAddRating()}
+                            >
+                              Add Rating
+                            </button>
                           </div>
-                          <p className="text-pink-800 font-bold">
-                            {rating.user.name}
-                          </p>
                         </div>
-                      </div>
-                    ))}
-                    {/* Add a new rating */}
-                    <div className="bg-pink-100 p-2 mt-4 rounded-2xl flex items-center justify-center text-center">
-                      <div className="flex items-center space-x-5">
-                        <input
-                          type="number"
-                          min="1"
-                          max="5"
-                          value={userRating}
-                          onChange={(e) =>
-                            setUserRating(parseInt(e.target.value))
-                          }
-                          className="w-16 text-center  h-12 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg"
-                        />
+
+                        {/* Add a close button if needed */}
                         <button
-                          className="bg-pink-600 text-white rounded-2xl px-4 py-2 hover:bg-pink-700 transition duration-300"
-                          onClick={async () => await handleAddRating()}
+                          onClick={() => setIsOpen(false)}
+                          className="text-gray-500 hover:text-gray-700 ml-2"
                         >
-                          Add Rating
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/106/106830.png"
+                            alt=""
+                            className="h-6 w-6 "
+                          />
                         </button>
                       </div>
                     </div>
+                  )}
+                  <h3 className="font-bold text-xl mb-3  border-b text-pink-600 text-left mt-4">
+                    {" "}
+                    Ratings{" "}
+                  </h3>
+                  <div className="grid grid-cols-2 space-x-3 space-y-3  ">
+                    {product.ratings &&
+                      product.ratings.map((rating, index) => (
+                        <article
+                          className={`p-1 ${
+                            !showAll && index > 1 ? "none" : ""
+                          }`}
+                        >
+                          <div class="flex items-center mb-1">
+                            <img
+                              class="w-10 h-10 me-4 rounded-full"
+                              src="https://cdn-icons-png.flaticon.com/512/666/666201.png"
+                              alt=""
+                            />
+                            <div class="font-medium dark:text-white">
+                              <p>Jese Leos</p>
+                            </div>
+                          </div>
+                          <div class="flex items-center mb-1 space-x-1 rtl:space-x-reverse">
+                            <StarRating averageRating={rating.rating} />
+                            <h3 class="ms-2 text-sm font-semibold text-gray-900 dark:text-white">
+                              Reviewed form {rating.user.address.city}
+                            </h3>
+                          </div>
+                          <p class="mb-2 text-gray-500 dark:text-gray-400">
+                            {rating.review ??
+                              "This is my third Invicta Pro Diver. They are just fantastic value for money. This one arrived yesterday and the first thing I did was set the time, popped on an identical strap from another Invicta and went in the shower with it to test the waterproofing.... No problems."}
+                          </p>
+                          <aside>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              {rating.likes} people found this helpful
+                            </p>
+                            <div class="flex items-center mt-3">
+                              <button
+                                class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-xs px-2 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                                onClick={() =>
+                                  handleRatingLike(rating._id, index)
+                                }
+                              >
+                                Helpful
+                              </button>
+                            </div>
+                          </aside>
+                        </article>
+                      ))}
                   </div>
+                  {product.ratings && (
+                    <button
+                      onClick={() => setShowAll(!showAll)}
+                      className="text-blue-600 block relative bottom-0 right-0 hover:underline dark:text-blue-500"
+                    >
+                      {showAll ? "Show less" : "Show more"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -375,51 +604,10 @@ const Product = () => {
             Recommended Products
           </h2>
           <div className="flex flex-wrap justify-start">
-            {recommendedProducts.map((product) => (
-              <div
-                key={product._id}
-                className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-                style={{ width: "20vw", height: "32.5vw" }}
-              >
-                <img
-                  src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                  className="h-100 w-full object-cover rounded-t-2xl"
-                  style={{ height: "15vw", width: "20vw" }}
-                  alt={product.title}
-                />
-                <div className="p-4">
-                  <h3 className="text-pink-800 text-xl font-semibold mb-2">
-                    {product.title}
-                  </h3>
-                  <p
-                    className="text-pink-600"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                  />
-                  <p className="text-gray-400 font-semibold text-lg">
-                    ${product.price}
-                  </p>
-                  <p className="text-pink-800 font-bold text-sm">
-                    Brand : {product.brand}
-                  </p>
-                  <p className="text-pink-800 font-bold text-sm">
-                    Category : {product.category}
-                  </p>
-                  <Link to={`/product/${product._id}`}>
-                    <button className="bg-pink-500 font-semibold text-white rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
-                      View More
-                    </button>
-                  </Link>
-                  <button
-                    className="bg-pink-500 font-semibold text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
-                    onClick={() => {
-                      // Handle add to cart click here
-                    }}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            ))}
+            {recommendedProducts &&
+              recommendedProducts.map((product) => (
+                <ProductCard product={product} addToCart={addToCart} />
+              ))}
           </div>
         </>
       )}

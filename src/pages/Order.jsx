@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import useStore from "../store/index"
+import ProductCard from "./ProductCard.jsx";
 
 const Order = () => {
   const product = useStore((state) => state.product)
@@ -123,7 +124,7 @@ const Order = () => {
             </div>
             <div className="flex justify-center">
               <button
-                className="bg-pink-700 text-white px-4 py-2 rounded-2xl hover:bg-pink-800 transition duration-300"
+                className="bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-pink-800 transition duration-300"
                 onClick={handleConfirmOrder}
               >
                 Confirm Order

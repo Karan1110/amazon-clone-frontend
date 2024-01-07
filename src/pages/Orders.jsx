@@ -8,7 +8,12 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3900/api/analytics/orders"
+          "http://localhost:3900/api/analytics/orders",
+          {
+            headers: {
+              "x-auth-token": localStorage.getItem("token"),
+            },
+          }
         )
         if (!response.ok) {
           throw new Error("Failed to fetch orders")
@@ -27,48 +32,49 @@ const Orders = () => {
     <div className="flex flex-wrap justify-center min-h-[67vh] ">
       {orders.length > 0 ? (
         orders.map((order) => (
-          <div
-            key={order._id}
-            className="border border-pink-500 mb-4 rounded-2xl mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-            style={{ width: "20vw", height: "32.5vw" }}
-          >
-            <img
-              src={`http://localhost:3900/${order.product.forms[0].image_filename}`}
-              className="h-100 w-full object-cover rounded-t-2xl "
-              style={{ height: "15vw", width: "20vw" }}
-              alt={`Order ${order._id}`}
-            />
-            <div className="p-4">
-              <h3 className="text-pink-800 text-xl font-semibold mb-2">
-                {order.product.title}
-              </h3>
-              <p
-                className="text-pink-600"
-                dangerouslySetInnerHTML={{ __html: order.product.description }}
-              />
-              <p className="text-gray-400 font-semibold text-lg">
-                ${order.product.price}
-              </p>
-              <p className="text-pink-800 font-bold text-sm">
-                Brand: {order.product.brand}
-              </p>
-              <p className="text-pink-800 font-bold text-sm">
-                Category: {order.product.category}
-              </p>
-              <p className="text-pink-800 font-bold text-sm">
-                Quantity: {order.quantity}
-              </p>
-              <p className="text-pink-800 font-bold text-sm">
-                Size: {order.size}
-              </p>
-              <p className="text-pink-800 font-bold text-sm">
-                Status: {order.status}
-              </p>
-              <Link to={`/product/${order.product._id}`}>
-                <button className="bg-pink-500 text-white font-semibold rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
-                  View More
-                </button>
+          <div className="max-w-2xl m-7" key={order._id}>
+            <div className="bg-white shadow-lg rounded-lg max-w-sm dark:bg-gray-800 dark:border-gray-700">
+              <Link to={`/product/${order.product?._id}`}>
+                <img
+                  className="px-2 h-[350px] w-[280px]"
+                  src={`http://localhost:3900/${order.product?.forms[0]?.image_filename}`}
+                  alt={`Order ${order._id}`}
+                />
               </Link>
+              <div className="px-3 pb-3">
+                <h3 className="text-gray-900 font-semibold text-xl mt-1 tracking-tight dark:text-white">
+                  {order.product?.title}
+                </h3>
+                <p
+                  className="text-pink-600"
+                  dangerouslySetInnerHTML={{
+                    __html: order.product?.description,
+                  }}
+                />
+                <p className="text-gray-400 font-semibold text-lg">
+                  ${order.product?.price}
+                </p>
+                <p className="text-pink-800 font-bold text-sm">
+                  Brand: {order.product?.brand}
+                </p>
+                <p className="text-pink-800 font-bold text-sm">
+                  Category: {order.product?.category}
+                </p>
+                <p className="text-pink-800 font-bold text-sm">
+                  Quantity: {order.quantity}
+                </p>
+                <p className="text-pink-800 font-bold text-sm">
+                  Size: {order.size}
+                </p>
+                <p className="text-pink-800 font-bold text-sm">
+                  Status: {order.status}
+                </p>
+                <Link to={`/product/${order.product?._id}`}>
+                  <button className="bg-pink-500 text-white font-semibold rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
+                    View More
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
         ))

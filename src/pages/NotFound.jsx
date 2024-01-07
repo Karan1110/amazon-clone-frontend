@@ -10,7 +10,7 @@ function NotFound() {
         Page not found.
       </div>
       <Link to="/">
-        <button className="rounded-2xl hover:bg-pink-700 font-semibold bg-pink-600 p-3 border-pink-800 mt-3">
+        <button className="rounded-2xl hover:bg-blue-600 font-semibold bg-pink-600 p-3 border-pink-800 mt-3">
           {" "}
           Browse Products
         </button>

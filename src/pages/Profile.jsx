@@ -10,9 +10,9 @@ const Profile = () => {
   const user = useStore((state) => state.user)
   const navigate = useNavigate()
 
-   if (!localStorage.getItem("token")) {
-      navigate("/signup", { state: { from: window.location.pathname } })
-    }
+  if (!localStorage.getItem("token")) {
+    navigate("/signup", { state: { from: window.location.pathname } })
+  }
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false)
@@ -58,13 +58,13 @@ const Profile = () => {
                     localStorage.removeItem("user")
                     localStorage.removeItem("token")
                   }}
-                  className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+                  className="bg-pink-500 m-9  text-white py-2 px-4 rounded-full font-semibold hover:bg-pink-800"
                 >
                   Log Out
                 </button>
               ) : (
                 <button
-                  className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+                  className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-blue-600"
                   onClick={() => navigate("/signup")}
                 >
                   Sign up
@@ -103,13 +103,13 @@ const Profile = () => {
                   localStorage.removeItem("user")
                   localStorage.removeItem("token")
                 }}
-                className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+                className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-blue-600"
               >
                 Log Out
               </button>
             ) : (
               <button
-                className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-pink-700"
+                className="bg-pink-500 m-9 text-white py-2 px-4 rounded hover:bg-blue-600"
                 onClick={() => navigate("/signup")}
               >
                 Sign up

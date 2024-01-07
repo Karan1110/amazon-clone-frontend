@@ -6,8 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 
 const images = [
-  "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
-
+  "https://assets.ajio.com/medias/sys_master/root/20230623/wZOh/64951560d55b7d0c63b13d4a/-473Wx593H-465014427-multi-MODEL.jpg",
   "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80",
 
   "https://media.istockphoto.com/id/1007108388/photo/strike-a-pose.jpg?s=612x612&w=0&k=20&c=gfXau8bi07KoySiRWAA4VKc-zuNM39BmQM7Zcz88B8Y=",
@@ -58,13 +57,13 @@ const SideBar = () => {
           />
         </div>
       </div>
-      <div className="flex flex-column mt-3 text-center items-center justify-center">
+      <div className="flex flex-column mt-3  relative bottom-[60px] text-center items-center justify-center">
         {images.map((_, index) => (
           <button
             key={index}
             className={`${
-              currentImage === index ? "bg-blue-500" : "bg-gray-500"
-            } w-5 h-5 m-2 text-center rounded-full `}
+              currentImage === index ? "bg-white" : "border-2 border-white"
+            } w-4 h-4 m-1 text-center rounded-full shadow-2xl`}
             style={{}}
             onClick={() => {
               setCurrentImage(index)

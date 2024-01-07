@@ -1,10 +1,11 @@
 const ProductStore = (set) => ({
   product: {}, // Initial state for product, set to null initially
-  addRating: async (id, rating) => {
+  addRating: async (id, rating, review) => {
     const body = {
       rating: rating,
-    };
-    console.log(id, rating);
+      review: review,
+    }
+    console.log(id, rating)
     const response = await fetch(
       `http://localhost:3900/api/products/${id}/rating`,
       {
@@ -15,10 +16,10 @@ const ProductStore = (set) => ({
         },
         body: JSON.stringify(body), // Convert the body object to a JSON string
       }
-    );
+    )
 
-    const data = await response.json();
-    return data;
+    const data = await response.json()
+    return data
   },
   fetchProduct: async (id) => {
     try {
@@ -26,18 +27,23 @@ const ProductStore = (set) => ({
         headers: {
           "x-auth-token": localStorage.getItem("token"),
         },
-      });
+      })
 
-      const data = await response.json();
-      console.log(data);
+      if (!response.ok) {
+        console.log(`Error fetching product. Status: ${response.status}`)
+        return
+      }
+
+      const data = await response.json()
+      console.log("Fetched product data:", data)
 
       set({
         product: data,
-      });
+      })
     } catch (error) {
-      console.error("Error fetching product data:", error.message);
+      console.error("Error fetching product data:", error.message)
     }
   },
-});
+})
 
-export default ProductStore;
+export default ProductStore

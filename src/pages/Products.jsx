@@ -3,18 +3,20 @@ import { Link, useNavigate } from "react-router-dom"
 import useStore from "../store/index"
 import addNotification from "react-push-notification"
 import { useState, useEffect } from "react"
+import ProductCard from "./ProductCard.jsx"
 const Products = () => {
   const [page, setPage] = useState(0)
   const [products, setProducts] = useState(null)
   const trending_products = useStore((state) => state.trending_products)
   const top_products = useStore((state) => state.top_products)
   const addToCart = useStore((state) => state.addToCart)
+
   console.log(products)
   const history = useNavigate()
-  function send() {
+  function send(title) {
     try {
       addNotification({
-        title: "Welcome",
+        title: `${title} added to your cart!`,
         subtitle: "From KaranStore",
         message: "browse exclusive products from KaranStore!",
         theme: "darkblue",
@@ -24,16 +26,16 @@ const Products = () => {
       console.error(ex)
     }
   }
-  send()
 
-  async function sendCartFetchRequest(productId, authToken) {
+  async function sendCartFetchRequest(productId, title) {
     if (!localStorage.getItem("token")) {
       history("/signup", { state: { from: window.location.pathname } })
     }
 
     try {
       // Add 'await' here to wait for the addToCart function to complete
-      await addToCart(productId, authToken)
+      await addToCart(productId)
+      send(title)
     } catch (error) {
       // Handle any other errors that may occur during the fetch
       console.error("Error occurred while fetching data:", error.message)
@@ -61,58 +63,15 @@ const Products = () => {
   }
   return (
     <>
-      <h2 className="text-pink-900 text-2xl m-5  font-bold" id="products">
-        Our Products
+      <h2 className="text-pink-900 text-2xl m-3 mt-1  font-bold" id="products">
+        Latest
       </h2>
       <div className="flex items-center ">
         {products ? (
           products.map((product) => (
-            <div
-              className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-              style={{ width: "20vw", height: "32.5vw" }}
-            >
-              <img
-                src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                className="h-100 w-full object-cover rounded-t-2xl "
-                style={{ height: "15vw", width: "20vw" }}
-              />
-              <div className="p-4">
-                <h3 className="text-pink-800 text-xl font-semibold mb-2">
-                  {product.title}
-                </h3>{" "}
-                <p
-                  className="text-pink-600"
-                  dangerouslySetInnerHTML={{ __html: product.description }}
-                />
-                <p className="text-gray-400 font-semibold text-lg">
-                  ${product.price}
-                </p>
-                <p className="text-pink-800 font-bold text-sm">
-                  Brand : {product.brand}
-                </p>
-                <p className="text-pink-800 font-bold text-sm">
-                  category : {product.category}
-                </p>
-                <Link to={`/product/${product._id}`}>
-                  <button className="bg-pink-500 text-white font-semibold  rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
-                    View More
-                  </button>
-                </Link>
-                <button
-                  className="bg-pink-500 text-white font-semibold rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
-                  id="my_button"
-                  onClick={() => {
-                    sendCartFetchRequest(
-                      product._id,
-                      localStorage.getItem("token")
-                    )
-                    send()
-                  }}
-                >
-                  add to cart.
-                </button>
-              </div>
-            </div>
+            <>
+              <ProductCard product={product} addToCart={sendCartFetchRequest} />
+            </>
           ))
         ) : (
           <div className="text-center text-cl font-bold text-pink-500">
@@ -121,10 +80,10 @@ const Products = () => {
           </div>
         )}
       </div>
-      <div class="inline-flex m-7">
+      <div className="inline-flex m-7 text-center items-center justify-center ">
         <button
-          class={`bg-gray-300 hover:bg-gray-400 text-gray-800 text-lg font-bold py-4 border-r px-6 rounded-l ${
-            page === 0 ? "cursor-not-allowed bg-gray-500" : ""
+          className={` rounded-r-none shadow-2xl rounded-full text-center   hover:bg-gray-100   text-gray-800 text-lg font-bold py-4  px-6 rounded-full ${
+            page === 0 ? "cursor-not-allowed " : ""
           }`}
           onClick={() => handlePageClick(page - 1)}
           disabled={page === 0}
@@ -132,7 +91,7 @@ const Products = () => {
           Prev
         </button>
         <button
-          class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-lg  border-l font-bold py-4 px-6 rounded-r"
+          className=" rounded-l-none rounded-full shadow-2xl border-l  text-center  hover:bg-gray-100   border-gray-300 text-gray-800 text-lg   font-bold py-4 px-6 rounded-full-r"
           onClick={() => handlePageClick(page + 1)}
         >
           Next
@@ -145,51 +104,12 @@ const Products = () => {
       <div className="flex items-center ">
         {trending_products
           ? trending_products.map((product) => (
-              <div
-                className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-                style={{ width: "20vw", height: "32.5vw" }}
-              >
-                <img
-                  src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                  className="h-100 w-full object-cover rounded-t-2xl"
-                  style={{ height: "15vw", width: "20vw" }}
+              <>
+                <ProductCard
+                  product={product}
+                  addToCart={sendCartFetchRequest}
                 />
-                <div className="p-4">
-                  <h3 className="text-pink-800 text-xl font-semibold mb-2">
-                    {product.title}
-                  </h3>
-                  <p
-                    className="text-pink-600"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                  />
-                  <p className="text-gray-400 font-semibold text-lg">
-                    ${product.price}
-                  </p>
-                  <p className="text-pink-800 font-bold text-sm">
-                    Brand : {product.brand}
-                  </p>
-                  <p className="text-pink-800 font-bold text-sm">
-                    category : {product.category}
-                  </p>
-                  <Link to={`/product/${product._id}`}>
-                    <button className="bg-pink-500 text-white font-semibold rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
-                      View More
-                    </button>
-                  </Link>
-                  <button
-                    className="bg-pink-500 text-white font-semibold  rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
-                    onClick={() => {
-                      sendCartFetchRequest(
-                        product._id,
-                        localStorage.getItem("token")
-                      )
-                      send()
-                    }}
-                  >
-                    add to cart.
-                  </button>
-                </div>
-              </div>
+              </>
             ))
           : null}
       </div>
@@ -199,52 +119,12 @@ const Products = () => {
       <div className="flex items-center ">
         {top_products
           ? top_products.map((product) => (
-              <div
-                className="border border-pink-500 mb-4 rounded-2xl  mr-4 ml-4 mt-4 shadow-xl min-h-xl"
-                style={{ width: "20vw", height: "32.5vw" }}
-              >
-                <img
-                  src={`http://localhost:3900/${product.forms[0].image_filename}`}
-                  className="h-100 w-full object-cover rounded-t-2xl "
-                  style={{ height: "15vw", width: "20vw" }}
+              <>
+                <ProductCard
+                  product={product}
+                  addToCart={sendCartFetchRequest}
                 />
-                <div className="p-4">
-                  <h3 className="text-pink-800 text-xl font-semibold mb-2">
-                    {product.title}
-                  </h3>
-                  <p
-                    className="text-pink-600"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                  />
-                  <p className="text-gray-400 font-semibold text-lg">
-                    ${product.price}
-                  </p>
-                  <p className="text-pink-800 font-bold text-sm">
-                    Brand : {product.brand}
-                  </p>
-                  <p className="text-pink-800 font-bold text-sm">
-                    category : {product.category}
-                  </p>
-                  <Link to={`/product/${product._id}`}>
-                    <button className="bg-pink-500 text-white font-semibold rounded-2xl px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300">
-                      View More
-                    </button>
-                  </Link>
-                  <button
-                    className="bg-pink-500 font-semibold text-white rounded-2xl m-2 px-4 py-2 mt-2 hover:bg-pink-600 transition duration-300"
-                    onClick={() => {
-                      sendCartFetchRequest(
-                        product._id,
-                        localStorage.getItem("token")
-                      )
-
-                      send()
-                    }}
-                  >
-                    add to cart.
-                  </button>
-                </div>
-              </div>
+              </>
             ))
           : null}
       </div>
